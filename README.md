@@ -45,8 +45,12 @@ Vector RAG agent:
 python agent/01_rag_agent.py
 ```
 
-Graph RAG agent:
+Graph RAG agents:
 
 ```bash
-python agent/02_graphrag_agent.py
+python agent/02_01_graphrag_agent.py
+```
+
+```bash
+python agent/02_02_graphrag_agent.py
 ```
