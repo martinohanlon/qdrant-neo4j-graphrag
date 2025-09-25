@@ -21,8 +21,6 @@ graph = Neo4jGraph(
     username=os.getenv("NEO4J_USERNAME"), 
     password=os.getenv("NEO4J_PASSWORD"),
 )
-
-# Define the retrieval query
 retrieval_query = """
 MATCH (node)-[:FROM_DOCUMENT]-(doc:Document)-[:FILED]-(company:Company)
 RETURN 
@@ -30,10 +28,11 @@ RETURN
     score,
     {
         company: company.name,
-        risks: [ (company:Company)-[:FACES_RISK]->(risk:RiskFactor) | risk.name ]
+        assetManagers: [ (company:Company)<-[:OWNS]-(am:AssetManager) | am.managerName ]
     } AS metadata
 ORDER BY score DESC
 """
+
 
 # Create Vector
 chunk_vector = Neo4jVector.from_existing_index(

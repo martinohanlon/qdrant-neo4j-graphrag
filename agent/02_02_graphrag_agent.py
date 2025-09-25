@@ -8,6 +8,7 @@ from langchain_core.tools import tool
 from langchain_neo4j import Neo4jGraph, Neo4jVector
 from langchain_openai import OpenAIEmbeddings
 
+
 # Initialize the LLM
 model = init_chat_model("gpt-4o", model_provider="openai")
 
@@ -21,13 +22,28 @@ graph = Neo4jGraph(
     password=os.getenv("NEO4J_PASSWORD"),
 )
 
+# Define the retrieval query
+retrieval_query = """
+MATCH (node)-[:FROM_DOCUMENT]-(doc:Document)-[:FILED]-(company:Company)
+RETURN 
+    node.text as text,
+    score,
+    {
+        company: company.name,
+        risks: [ (company:Company)-[:FACES_RISK]->(risk:RiskFactor) | risk.name ],
+        assetManagers: [ (company:Company)<-[:OWNS]-(am:AssetManager) | am.managerName ]
+    } AS metadata
+ORDER BY score DESC
+"""
+
 # Create Vector
 chunk_vector = Neo4jVector.from_existing_index(
     embedding_model,
     graph=graph,
     index_name="chunkEmbeddings",
     embedding_node_property="embedding",
-    text_node_property="text"
+    text_node_property="text",
+    retrieval_query=retrieval_query,
 )
 
 # Define a tool to retrieve financial documents
@@ -50,7 +66,8 @@ agent = create_react_agent(
 )
 
 # Run the application
-query = "Who are the asset managers most affected by banking regulations?"
+query = "What are the risks that Microsoft faces?"
+
 for step in agent.stream(
     {
         "messages": [{"role": "user", "content": query}]
