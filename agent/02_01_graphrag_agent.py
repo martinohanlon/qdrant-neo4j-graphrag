@@ -64,7 +64,7 @@ agent = create_react_agent(
 )
 
 # Run the application
-query = "What are the risks that Microsoft faces?"
+query = "Who are the asset managers most affected by banking regulations?"
 
 for step in agent.stream(
     {
