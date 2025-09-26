@@ -8,7 +8,6 @@ from langchain_core.tools import tool
 from langchain_neo4j import Neo4jGraph, Neo4jVector
 from langchain_openai import OpenAIEmbeddings
 
-
 # Initialize the LLM
 model = init_chat_model("gpt-4o", model_provider="openai")
 
@@ -21,6 +20,7 @@ graph = Neo4jGraph(
     username=os.getenv("NEO4J_USERNAME"), 
     password=os.getenv("NEO4J_PASSWORD"),
 )
+
 retrieval_query = """
 MATCH (node)-[:FROM_DOCUMENT]-(doc:Document)-[:FILED]-(company:Company)
 RETURN 
@@ -32,7 +32,6 @@ RETURN
     } AS metadata
 ORDER BY score DESC
 """
-
 
 # Create Vector
 chunk_vector = Neo4jVector.from_existing_index(
